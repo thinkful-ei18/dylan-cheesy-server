@@ -2,14 +2,11 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-
 const { PORT, CLIENT_ORIGIN } = require('./config');
 const { dbConnect } = require('./db-mongoose');
 // const {dbConnect} = require('./db-knex');
-
 const app = express();
-
-const cheeses = ['Bath Blue', 'Barkham Blue', 'Buxton Blue', 'Cheshire Blue', 'Devon Blue', 'Dorset Blue Vinney', 'Dovedale', 'Exmoor Blue', 'Harbourne Blue', 'Lanark Blue', 'Lymeswold', 'Oxford Blue', 'Shropshire Blue', 'Stichelton', 'Stilton', 'Blue Wensleydale', 'Yorkshire Blue'];
+const { Cheese } = require('./models/cheese');
 
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
@@ -26,12 +23,15 @@ app.use(
 app.use(express.json());
 
 app.get('/api/cheeses', (req, res, next) => {
-  res.json(cheeses);
+  Cheese.find().then(cheeses => res.json(cheeses));
 });
 
 app.post('/api/cheeses', (req, res, next) => {
-  cheeses.push(req.body.cheese);
-  res.status(201).json(req.body.cheese);
+  const newCheese = {
+    name: req.body.name
+  };
+  Cheese.create(newCheese)
+    .then(res.status(201).end()); 
 });
 
 function runServer(port = PORT) {
