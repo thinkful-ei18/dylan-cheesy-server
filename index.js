@@ -9,6 +9,8 @@ const { dbConnect } = require('./db-mongoose');
 
 const app = express();
 
+const cheeses = ['Bath Blue', 'Barkham Blue', 'Buxton Blue', 'Cheshire Blue', 'Devon Blue', 'Dorset Blue Vinney', 'Dovedale', 'Exmoor Blue', 'Harbourne Blue', 'Lanark Blue', 'Lymeswold', 'Oxford Blue', 'Shropshire Blue', 'Stichelton', 'Stilton', 'Blue Wensleydale', 'Yorkshire Blue'];
+
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
     skip: (req, res) => process.env.NODE_ENV === 'test'
@@ -21,9 +23,15 @@ app.use(
   })
 );
 
+app.use(express.json());
+
 app.get('/api/cheeses', (req, res, next) => {
-  const cheese = ['Bath Blue', 'Barkham Blue', 'Buxton Blue', 'Cheshire Blue', 'Devon Blue', 'Dorset Blue Vinney', 'Dovedale', 'Exmoor Blue', 'Harbourne Blue', 'Lanark Blue', 'Lymeswold', 'Oxford Blue', 'Shropshire Blue', 'Stichelton', 'Stilton', 'Blue Wensleydale', 'Yorkshire Blue'];
-  res.json(cheese);
+  res.json(cheeses);
+});
+
+app.post('/api/cheeses', (req, res, next) => {
+  cheeses.push(req.body.cheese);
+  res.status(201).json(req.body.cheese);
 });
 
 function runServer(port = PORT) {
